@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="uz" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - E-Commerce</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #2C3E50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background-color: #34495E;
+            margin-top: 10px;
+        }
+
+        nav ul li {
+            margin-right: 30px;
+            font-size: 18px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #1ABC9C;
+        }
+
+        main {
+            padding: 40px;
+            flex-grow: 1;
+        }
+
+        .stat-cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            width: 30%;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #2C3E50;
+        }
+
+        .card p {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1ABC9C;
+        }
+
+        .product-list {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            max-height: 400px; /* maksimal balandlik */
+            overflow-y: auto; /* vertikal scroll */
+        }
+
+        .product-list table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .product-list table th, .product-list table td {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .product-list table th {
+            background-color: #34495E;
+            color: white;
+        }
+
+        .product-list table td {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+
+        .product-list table td button {
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            background-color: #3498DB;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .product-list table td button:hover {
+            background-color: #2980B9;
+        }
+
+        .add-category-btn {
+            background-color: #27AE60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+
+        .add-category-btn:hover {
+            background-color: #2ECC71;
+        }
+
+        .form-btn {
+            padding: 12px 20px;
+            background-color: #E67E22;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+        .form-btn:hover {
+            background-color: #D35400;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2C3E50;
+            color: white;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>Admin Panel</h1>
+        <nav>
+            <ul>
+                <li><a href="/category/showCategories">Kategoriyalar</a></li>
+                <li><a href="/product/showProducts">Mahsulotlar</a></li>
+                <li><a href="/order/showOrder">Buyurtmalar</a></li>
+                <li><a href="/user/showUsers">Foydalanuvchilar</a></li>
+                <li><a href="/settings">Sozlamalar</a></li>
+                <li><a href="/auth/logout">Chiqish</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="product-list">
+            <h2>Kategoriyalar ro'yxati</h2>
+            <form action="/addCategory">
+                <button class="add-category-btn">Kategoriya qo'shish</button>
+            </form>
+            <table>
+                <thead>
+                <tr>
+                    <th>Nomi</th>
+                    <th>Amallar</th>
+                </tr>
+                </thead>
+                <tbody th:each="category:${categories}">
+                <tr>
+                    <td th:text="${category.getName()}"></td>
+                    <td>
+                        <form action="/category/delete" method="post">
+                            <input type="hidden" name="id" th:value="${category.id}">
+                            <button class="form-btn">O'CHIRISH</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 E-Commerce. Barcha huquqlar himoyalangan.</p>
+    </footer>
+</div>
+</body>
+</html>
